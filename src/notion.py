@@ -170,7 +170,7 @@ class NotionApiHandler(Parameters):
                 },
                 "children": [
                     NotionObject(item["type"])(item["values"])
-                    for item in data["children"]
+                    for item in data.get("children", [])
                 ]
             }
         )
@@ -179,6 +179,7 @@ class NotionApiHandler(Parameters):
             url = response.json()["url"]
             print("Page creation into database")
             print("%s: %s" % ("URL".rjust(10), url))
+            return response.json()
         except:
             print(response.text)
     
@@ -200,3 +201,17 @@ class NotionApiHandler(Parameters):
     @staticmethod
     def extend_rich_text(text):
         return {f"text{i+1}": text[i*2000:(i+1)*2000] for i in range(len(text)//2000+1)}
+
+    def delete_page(self, page_id: str):
+        response = requests.patch(
+            url=self._pages_endpoint + f"/{page_id}",
+            headers=self.headers,
+            json={"archived": True}
+        )
+        response.raise_for_status()
+        try:
+            response.raise_for_status()
+            print(page_id + " deleted")
+        except:
+            print(response.text)
+
