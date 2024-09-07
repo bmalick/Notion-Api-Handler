@@ -47,11 +47,15 @@ class NotionObject:
     @property
     def objects(self) -> dict: return read_yaml(self._objects_fname)
     
-    def __call__(self, values: dict) -> Dict:
+    def __call__(self, values: dict, children: list[dict] = None) -> Dict:
         if values is None: return None
         args = self.objects[self.name].copy()
         item = args["object"].copy()
         paths = args["paths"]
+        if children is not None:
+            values["children"] = [
+                NotionObject(item["type"])(item["values"])
+                for item in children]
         for name, val in values.items():
             if args.get("extend_paths", False):
                 try:
@@ -70,6 +74,7 @@ class NotionApiHandler(Parameters):
     _database_endpoint = "https://api.notion.com/v1/databases"
     _query_endpoint = "https://api.notion.com/v1/databases/%s/query"
     _max_chars = 1999
+    _blocks_endpoint = "https://api.notion.com/v1/blocks/%s/children"
 
     def __init__(self) -> None:
         self.set_headers()
@@ -169,7 +174,7 @@ class NotionApiHandler(Parameters):
                     for item in data["properties"]
                 },
                 "children": [
-                    NotionObject(item["type"])(item["values"])
+                    NotionObject(item["type"])(values=item["values"], children=item.get("children"))
                     for item in data.get("children", [])
                 ]
             }
@@ -212,6 +217,23 @@ class NotionApiHandler(Parameters):
         try:
             response.raise_for_status()
             print(page_id + " deleted")
+        except:
+            print(response.text)
+
+    def add_children(self, page_id: str, data: dict):
+        response = requests.patch(
+            url=self._blocks_endpoint % page_id,
+            headers=self.headers,
+            json={
+                "children": [
+                    NotionObject(item["type"])(values=item["values"], children=item.get("children"))
+                    for item in data.get("children", [])
+                ]
+            }
+        )
+        try:
+            response.raise_for_status()
+            return response.json()
         except:
             print(response.text)
 

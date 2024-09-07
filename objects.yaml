@@ -377,14 +377,13 @@ to_do:
                     content: null
             checked: false
             color: default
-            # children:
-            # - type: paragraph
 toggle:
     extend_paths: True
     paths:
         text: toggle.rich_text[0].text.content
         checked: toggle.checked
         color: toggle.color
+        children: toggle.children
     object:
         type: toggle
         toggle:
@@ -393,5 +392,4 @@ toggle:
                   text:
                     content: null
             color: default
-            # children:
-            # - type: paragraph
+            # children: null
