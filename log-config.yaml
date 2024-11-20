@@ -1,0 +1,25 @@
+version: 1
+
+formatters:
+  simple:
+    format: '%(asctime)s [%(levelname)s] %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: simple
+    level: INFO
+    stream: ext://sys.stdout
+  file:
+    class: logging.FileHandler
+    formatter: simple
+    level: INFO
+    filename: /home/malick/Desktop/logs/notion/delete.log
+    mode: a
+
+loggers:
+  delete:
+    level: INFO
+    handlers: [console, file]
