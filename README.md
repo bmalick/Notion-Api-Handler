@@ -69,17 +69,17 @@ handler.create_database(
 
 ### Querying a Database
 ```python
-    filters = {
-        "and": [
-            {"property": "Completed",
-            "checkbox": {"equals": True}},
-            {"property": "Project",
-             "relation": {"is_empty": True}}
-        ]
-    }
-    sorts = [
-        {"property": "Date creation", "direction": "ascending"}
+filters = {
+    "and": [
+        {"property": "Completed",
+        "checkbox": {"equals": True}},
+        {"property": "Project",
+         "relation": {"is_empty": True}}
     ]
+}
+sorts = [
+    {"property": "Date creation", "direction": "ascending"}
+]
 
 results = handler.query_database(
     database_id="database_id", 
